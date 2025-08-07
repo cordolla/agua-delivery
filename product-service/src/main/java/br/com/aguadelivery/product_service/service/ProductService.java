@@ -18,15 +18,15 @@ public class ProductService {
 
     @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDto) {
-        if (productRepository.findByName(productRequestDto.name()).isPresent()) {
+        if (productRepository.findByName(productRequestDto.getName()).isPresent()) {
             throw new RuntimeException("Produto ja existe");
         }
 
         Product product = new Product();
-        product.setName(productRequestDto.name());
-        product.setDescription(productRequestDto.description());
-        product.setPrice(productRequestDto.price());
-        product.setStockQuantity(productRequestDto.stockQuantity());
+        product.setName(productRequestDto.getName());
+        product.setDescription(productRequestDto.getDescription());
+        product.setPrice(productRequestDto.getPrice());
+        product.setStockQuantity(productRequestDto.getStockQuantity());
 
         Product productSaved = productRepository.save(product);
 

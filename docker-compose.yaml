@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: agua-delivery-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: products-service
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - agua-delivery-net
+
+  product-service:
+    build:
+      context: ./product-service
+      args:
+        JAR_FILE: target/product-service-0.0.1-SNAPSHOT.jar
+    container_name: product-service
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/products-service
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+    depends_on:
+      - postgres
+    networks:
+      - agua-delivery-net
+
+  order-service:
+    build:
+      context: ./order-service
+      args:
+        JAR_FILE: target/order-service-0.0.1-SNAPSHOT.jar
+    container_name: order-service
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/products-service
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      PRODUCT_SERVICE_URL: http://product-service:8080
+    depends_on:
+      - product-service
+      - postgres
+    networks:
+      - agua-delivery-net
+
+volumes:
+  postgres-data:
+
+networks:
+  agua-delivery-net:
+    driver: bridge

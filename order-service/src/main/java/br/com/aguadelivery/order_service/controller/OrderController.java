@@ -5,8 +5,13 @@ import br.com.aguadelivery.order_service.dto.OrderResponseDto;
 import br.com.aguadelivery.order_service.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@RequestMapping("api/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -15,6 +20,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(@RequestBody CreateOrderRequestDto requestDto) {
         OrderResponseDto createdOrder = orderService.createOrder(requestDto);
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);

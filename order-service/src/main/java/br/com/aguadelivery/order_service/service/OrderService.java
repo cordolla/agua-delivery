@@ -10,6 +10,7 @@ import br.com.aguadelivery.order_service.model.OrderItem;
 import br.com.aguadelivery.order_service.model.OrderStatus;
 import br.com.aguadelivery.order_service.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class OrderService {
         this.productServiceClient = productServiceClient;
     }
 
+    @Transactional
     public OrderResponseDto createOrder(CreateOrderRequestDto requestDto){
         Order order = new Order();
         order.setCustomerName(requestDto.getCustomerName());
@@ -43,6 +45,9 @@ public class OrderService {
             orderItem.setProductName(productDetails.getName());
             orderItem.setPriceAtTimeOfPurchase(productDetails.getPrice());
             orderItem.setQuantity(itemRequest.getQuantity());
+
+            BigDecimal subtotal = productDetails.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
+            orderItem.setSubtotal(subtotal);
 
             order.addItem(orderItem);
         }
