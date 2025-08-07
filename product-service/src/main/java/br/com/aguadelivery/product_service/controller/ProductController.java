@@ -24,7 +24,13 @@ public class ProductController {
     }
 
     @GetMapping("{id}")
-    public Product getProduct(@PathVariable Long id) {
-        return productService.findById(id);
+    public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long id) {
+        Product product = productService.findById(id);
+
+        ProductResponseDTO responseDto = new ProductResponseDTO(
+                product.getName(),
+                product.getPrice()
+        );
+        return ResponseEntity.ok(responseDto);
     }
 }

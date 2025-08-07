@@ -32,9 +32,7 @@ public class ProductService {
 
         return new ProductResponseDTO(
                 productSaved.getName(),
-                productSaved.getDescription(),
-                productSaved.getPrice(),
-                productSaved.getStockQuantity()
+                productSaved.getPrice()
         );
     }
 

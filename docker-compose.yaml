@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
@@ -21,9 +19,20 @@ services:
     networks:
       - agua-delivery-net
 
+  discovery-service:
+    build:
+      context: . # Mude para o diretório raiz
+      dockerfile: discovery-service/Dockerfile # Especifique o caminho do Dockerfile
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - agua-delivery-net
+
   product-service:
     build:
-      context: ./product-service
+      context: .
+      dockerfile: product-service/Dockerfile
       args:
         JAR_FILE: target/product-service-0.0.1-SNAPSHOT.jar
     container_name: product-service
@@ -33,31 +42,37 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/products-service
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
     # Modifica o depends_on para esperar que o serviço postgres seja saudável
     depends_on:
       postgres:
         condition: service_healthy
+      discovery-service: # MUDANÇA: Garante que o Eureka inicie antes deste serviço
+        condition: service_started
     networks:
       - agua-delivery-net
 
   order-service:
     build:
-      context: ./order-service
+      context: .
+      dockerfile: order-service/Dockerfile
       args:
         JAR_FILE: target/order-service-0.0.1-SNAPSHOT.jar
     container_name: order-service
     ports:
       - "8082:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/products-service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orders-service
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
-      PRODUCT_SERVICE_URL: http://product-service:8080
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
     depends_on:
       product-service:
         condition: service_started # Pode esperar apenas pelo início aqui
       postgres:
         condition: service_healthy
+      discovery-service: # MUDANÇA: Garante que o Eureka inicie antes deste serviço
+        condition: service_started
     networks:
       - agua-delivery-net
 
