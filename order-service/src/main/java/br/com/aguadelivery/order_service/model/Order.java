@@ -31,7 +31,7 @@ public class Order {
 
     private String shippingAddress;
 
-    @OneToMany
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
     public void addItem(OrderItem item){

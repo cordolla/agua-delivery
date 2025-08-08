@@ -31,6 +31,7 @@ public class ProductService {
         Product productSaved = productRepository.save(product);
 
         return new ProductResponseDTO(
+                productSaved.getId(),
                 productSaved.getName(),
                 productSaved.getPrice()
         );

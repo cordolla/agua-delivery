@@ -28,6 +28,7 @@ public class ProductController {
         Product product = productService.findById(id);
 
         ProductResponseDTO responseDto = new ProductResponseDTO(
+                product.getId(),
                 product.getName(),
                 product.getPrice()
         );
