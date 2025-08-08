@@ -9,18 +9,17 @@ COPY order-service/pom.xml ./order-service/
 COPY gateway-service/pom.xml ./gateway-service/
 
 # Copia o código-fonte APENAS do módulo atual
-COPY discovery-service/src ./discovery-service/src
+COPY gateway-service/src ./gateway-service/src
 
 # Constrói apenas o módulo atual
-RUN mvn -B -f pom.xml clean package -DskipTests -pl discovery-service -am
+RUN mvn -B -f pom.xml clean package -DskipTests -pl gateway-service -am
 
 # Estágio 2: Imagem Final de Execução
 FROM eclipse-temurin:17-jre-focal
 WORKDIR /app
 
 # Copia o .jar gerado do módulo atual
-COPY --from=build /app/discovery-service/target/*.jar app.jar
+COPY --from=build /app/gateway-service/target/*.jar app.jar
 
-# A porta padrão do Eureka Server é 8761
-EXPOSE 8761
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

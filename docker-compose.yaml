@@ -11,7 +11,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d products-service"]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d products-service" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -73,6 +73,22 @@ services:
         condition: service_started
     networks:
       - agua-delivery-net
+
+  gateway-service:
+    build:
+      context: .  # O contexto deve ser o diretório raiz do projeto
+      dockerfile: gateway-service/Dockerfile
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      # Use o nome do serviço do Eureka, não localhost
+      EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka
+    depends_on:
+      - discovery-service
+    networks:
+      - agua-delivery-net
+
 
 volumes:
   postgres-data:

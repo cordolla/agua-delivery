@@ -49,6 +49,8 @@ public class OrderService {
             BigDecimal subtotal = productDetails.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
             orderItem.setSubtotal(subtotal);
 
+            totalOrderAmount = totalOrderAmount.add(subtotal);
+
             order.addItem(orderItem);
         }
 
