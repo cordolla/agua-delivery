@@ -89,6 +89,17 @@ services:
     networks:
       - agua-delivery-net
 
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # Porta para a comunicação dos serviços
+      - "15672:15672" # Porta para a interface de gerenciamento web
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    networks:
+      - agua-delivery-net
 
 volumes:
   postgres-data:

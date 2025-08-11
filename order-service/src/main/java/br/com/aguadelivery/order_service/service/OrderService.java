@@ -9,6 +9,7 @@ import br.com.aguadelivery.order_service.model.Order;
 import br.com.aguadelivery.order_service.model.OrderItem;
 import br.com.aguadelivery.order_service.model.OrderStatus;
 import br.com.aguadelivery.order_service.repository.OrderRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +21,12 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductServiceClient productServiceClient;
+    private final RabbitTemplate rabbitTemplate;
 
-    public OrderService(OrderRepository orderRepository, ProductServiceClient productServiceClient) {
+    public OrderService(OrderRepository orderRepository, ProductServiceClient productServiceClient, RabbitTemplate rabbitTemplate) {
         this.orderRepository = orderRepository;
         this.productServiceClient = productServiceClient;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Transactional
@@ -57,6 +60,8 @@ public class OrderService {
         order.setTotalAmount(totalOrderAmount);
 
         Order savedOrder = orderRepository.save(order);
+
+        rabbitTemplate.convertAndSend("orders.exchange", "order.created", savedOrder.getId());
 
         return OrderMapper.toOrderResponseDto(savedOrder);
     }
