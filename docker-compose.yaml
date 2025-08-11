@@ -39,7 +39,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/products-service
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
-      # A variável de ambiente correta:
       EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
@@ -61,7 +60,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orders-service
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
-      # A variável de ambiente correta:
       EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
@@ -76,13 +74,12 @@ services:
 
   gateway-service:
     build:
-      context: .  # O contexto deve ser o diretório raiz do projeto
+      context: .
       dockerfile: gateway-service/Dockerfile
     container_name: gateway-service
     ports:
       - "8080:8080"
     environment:
-      # Use o nome do serviço do Eureka, não localhost
       EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka
     depends_on:
       - discovery-service
@@ -93,11 +90,35 @@ services:
     image: rabbitmq:3.13-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"  # Porta para a comunicação dos serviços
-      - "15672:15672" # Porta para a interface de gerenciamento web
+      - "5672:5672"
+      - "15672:15672"
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
+    networks:
+      - agua-delivery-net
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: payment-service
+    ports:
+      - "8083:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payments-service
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE: http://discovery-service:8761/eureka
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN}
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
     networks:
       - agua-delivery-net
 

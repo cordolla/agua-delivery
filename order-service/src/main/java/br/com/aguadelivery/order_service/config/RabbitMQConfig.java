@@ -13,9 +13,10 @@ public class RabbitMQConfig {
     public static final String EXCHANGE_NAME = "orders.exchange";
     public static final String QUEUE_NAME = "orders.v1.order-created";
     public static final String ROUTING_KEY = "order.created";
+    public static final String QUEUE_PAYMENT_CONFIRMED = "payments.v1.payment-confirmed";
 
     @Bean
-    public TopicExchange exchange(){
+    public TopicExchange exchange() {
         return new TopicExchange(EXCHANGE_NAME);
     }
 
@@ -25,7 +26,13 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange){
+    public Binding binding(Queue queue, TopicExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
     }
+
+    @Bean
+    public Queue paymentConfirmedQueue() {
+        return new Queue(QUEUE_PAYMENT_CONFIRMED, true);
+    }
+
 }

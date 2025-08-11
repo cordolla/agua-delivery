@@ -17,4 +17,7 @@ public class OrderResponseDto {
     private OrderStatus status;
     private BigDecimal totalAmount;
     private List<OrderItemResponseDto> items;
+
+    private String qrCodeBase64;
+    private String qrCodeCopyPaste;
 }

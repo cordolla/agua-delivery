@@ -28,8 +28,6 @@ public class Order {
 
     private BigDecimal totalAmount;
 
-    private String paymentId;
-
     private String shippingAddress;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
