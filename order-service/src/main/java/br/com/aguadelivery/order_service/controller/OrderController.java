@@ -3,6 +3,7 @@ package br.com.aguadelivery.order_service.controller;
 import br.com.aguadelivery.order_service.dto.CreateOrderRequestDto;
 import br.com.aguadelivery.order_service.dto.OrderResponseDto;
 import br.com.aguadelivery.order_service.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody CreateOrderRequestDto requestDto) {
+    public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody CreateOrderRequestDto requestDto) {
         OrderResponseDto createdOrder = orderService.createOrder(requestDto);
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
     }

@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -82,5 +83,18 @@ public class OrderService {
         responseDto.setQrCodeCopyPaste(paymentResponse.getQrCodeCopyPaste());
 
         return responseDto;
+    }
+
+    public OrderResponseDto listOrderById(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado"));
+
+        OrderResponseDto responseDto = OrderMapper.toOrderResponseDto(order);
+        return responseDto;
+    }
+
+    public List<OrderResponseDto> listPaidOrders() {
+        List<Order> paidOrders = orderRepository.findByStatus(OrderStatus.PAID);
+        return OrderMapper.toOrderResponseDtoList(paidOrders);
     }
 }

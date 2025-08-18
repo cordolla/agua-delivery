@@ -5,6 +5,9 @@ import br.com.aguadelivery.order_service.dto.OrderResponseDto;
 import br.com.aguadelivery.order_service.model.Order;
 import br.com.aguadelivery.order_service.model.OrderItem;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class OrderMapper {
 
     public static OrderResponseDto toOrderResponseDto(Order order) {
@@ -32,5 +35,11 @@ public class OrderMapper {
         dto.setPriceAtTimeOfPurchase(orderItem.getPriceAtTimeOfPurchase());
         dto.setSubtotal(orderItem.getSubtotal());
         return dto;
+    }
+
+    public static List<OrderResponseDto> toOrderResponseDtoList(List<Order> orders) {
+        return orders.stream()
+                .map(OrderMapper::toOrderResponseDto)
+                .toList();
     }
 }
