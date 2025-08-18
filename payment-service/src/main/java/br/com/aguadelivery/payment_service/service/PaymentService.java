@@ -11,7 +11,6 @@ import com.mercadopago.client.payment.PaymentPayerRequest;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,10 +21,14 @@ import java.time.ZoneOffset;
 @Service
 public class PaymentService {
 
-    @Autowired
-    private PaymentRepository paymentRepository;
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+
+    private final PaymentRepository paymentRepository;
+    private final RabbitTemplate rabbitTemplate;
+
+    public PaymentService(PaymentRepository paymentRepository, RabbitTemplate rabbitTemplate) {
+        this.paymentRepository = paymentRepository;
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
     @Transactional
     public Payment createPixPayment(CreatePaymentRequest request) throws MPException, MPApiException {
@@ -40,13 +43,14 @@ public class PaymentService {
                 .description("Pedido #" + request.getOrderId())
                 .paymentMethodId("pix")
                 .payer(PaymentPayerRequest.builder().email(request.getCustomerEmail()).firstName(request.getCustomerName()).build())
-                .notificationUrl("https://466dde853e38.ngrok-free.app/api/payments/webhook") // Lembre-se de usar sua URL do ngrok
+                .notificationUrl("https://466dde853e38.ngrok-free.app/api/payments/webhook")
                 .dateOfExpiration(OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(30))
                 .build();
 
         com.mercadopago.resources.payment.Payment mpPayment = client.create(createRequest);
 
         payment.setMercadoPagoPaymentId(mpPayment.getId());
+
         if (mpPayment.getPointOfInteraction() != null && mpPayment.getPointOfInteraction().getTransactionData() != null) {
             payment.setQrCodeBase64(mpPayment.getPointOfInteraction().getTransactionData().getQrCodeBase64());
             payment.setQrCodeCopyPaste(mpPayment.getPointOfInteraction().getTransactionData().getQrCode());
