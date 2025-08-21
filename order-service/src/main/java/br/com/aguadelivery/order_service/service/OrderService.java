@@ -85,16 +85,24 @@ public class OrderService {
         return responseDto;
     }
 
-    public OrderResponseDto listOrderById(Long id) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado"));
-
-        OrderResponseDto responseDto = OrderMapper.toOrderResponseDto(order);
-        return responseDto;
+    public List<OrderResponseDto> listDeliveredOrders() {
+        List<Order> deliveredOrders = orderRepository.findByStatus(OrderStatus.DELIVERED);
+        return OrderMapper.toOrderResponseDtoList(deliveredOrders);
     }
 
     public List<OrderResponseDto> listPaidOrders() {
         List<Order> paidOrders = orderRepository.findByStatus(OrderStatus.PAID);
         return OrderMapper.toOrderResponseDtoList(paidOrders);
     }
+
+    public List<OrderResponseDto> listPendingOrders() {
+        List<Order> pendingOrders = orderRepository.findByStatus(OrderStatus.PENDING_PAYMENT);
+        return OrderMapper.toOrderResponseDtoList(pendingOrders);
+    }
+
+    public List<OrderResponseDto> listCancelledOrders() {
+        List<Order> canceledOrders = orderRepository.findByStatus(OrderStatus.CANCELED);
+        return OrderMapper.toOrderResponseDtoList(canceledOrders);
+    }
+
 }

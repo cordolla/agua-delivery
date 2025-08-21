@@ -8,5 +8,5 @@ public class CreatePaymentRequest {
     private Long orderId;
     private BigDecimal amount;
     private String customerName;
-    private String customerEmail; // E-mail é importante para o Mercado Pago
+    private String customerEmail;
 }

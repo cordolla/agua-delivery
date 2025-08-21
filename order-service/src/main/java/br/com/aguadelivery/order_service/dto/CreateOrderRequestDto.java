@@ -1,8 +1,6 @@
 package br.com.aguadelivery.order_service.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.util.List;
@@ -25,7 +23,12 @@ public class CreateOrderRequestDto {
 
     @Data
     public static class OrderItemRequestDto {
+
+        @NotNull(message = "O ID do produto é obrigatório")
         private Long productId;
+
+        @NotNull(message = "O preço do produto é obrigatório")
+        @Min(value = 1, message = "O preço do produto deve ser maior que zero")
         private Integer quantity;
     }
 }
